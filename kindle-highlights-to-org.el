@@ -29,6 +29,7 @@
                                 "are you sure this is the right file? "))))
           (unless proceed
             (throw 'exit "Not the right file, cancelling."))))))
+  ;; NEXT: break out function and test
   ;; Reads the file into a variable
   ;; Parses the file into note blocks
   ;; Creates a books set-like list
