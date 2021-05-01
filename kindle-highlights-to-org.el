@@ -15,21 +15,33 @@
 
 (require 's)
 
+(defun kindle-highlights-to-org--get-file-path (&optional path)
+  "Asks the user for a file to read or read the full path from PATH.
+Return full path of the file. Performs basic checking on the file to confirm
+it can be read and the name is what the user intends."
+  (interactive "P")
+  (catch 'exit
+    (let ((full-file-path (or path
+                         (read-file-name "Select 'My Clippings.txt' file."))))
+      ;; Check filename, prompt if it seems wrong
+      (unless (s-ends-with? "My Clippings.txt" full-file-path)
+        (let ((proceed
+               (y-or-n-p (concat "File doesn't match 'My Clippings.txt'."
+                                 "\n"
+                                 "are you sure this is the right file? "))))
+          (unless proceed
+            (throw 'exit "Not the right file, cancelling."))))
+      ;; Check file exists
+      (unless (file-exists-p full-file-path)
+        (throw 'exit "File doesn't exist."))
+      ;; Check file can be read
+      (unless (file-readable-p full-file-path)
+        (throw 'exit "File can't be read."))
+      ;; Return path
+      full-file-path)))
+
 (defun kindle-highlights-to-org--main ()
   "Placeholder."
-  ;; Asks the user for a file to read
-  (interactive)
-  (catch 'exit
-    (let ((file-name (read-file-name "Select 'My Clippings.txt' file.")))
-      ;; Check filename, prompt if it seems wrong
-      (unless (s-ends-with? "My Clippings.txt" file-name)
-        (let ((proceed
-              (y-or-n-p (concat "File doesn't match 'My Clippings.txt'."
-                                "\n"
-                                "are you sure this is the right file? "))))
-          (unless proceed
-            (throw 'exit "Not the right file, cancelling."))))))
-  ;; NEXT: break out function and test
   ;; Reads the file into a variable
   ;; Parses the file into note blocks
   ;; Creates a books set-like list
