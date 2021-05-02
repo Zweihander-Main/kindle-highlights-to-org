@@ -1,4 +1,4 @@
-## 📖 kindle-highlights-to-org
+## kindle-highlights-to-org
 
 > Convert your Kindle highlights to an org tree
 
