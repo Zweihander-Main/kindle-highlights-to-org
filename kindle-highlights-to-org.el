@@ -1,13 +1,51 @@
 ;;; kindle-highlights-to-org.el --- Convert your Kindle highlights to an org tree
 ;;; -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2021, Zweihänder
+;; Copyright (C) 2021, Zweihänder <zweidev@zweihander.me>
 ;;
+;; Author: Zweihänder
+;; Keywords: org-mode, kindle
+;; Homepage: https://github.com/Zweihander-Main/kindle-highlights-to-org
 ;; Version: 0.0.1
+
+;; This file is not part of GNU Emacs.
+
+;;; License:
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU Affero General Public License as published
+;; by the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 ;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU Affero General Public License for more details.
+;;
+;; You should have received a copy of the GNU Affero General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 ;;; Commentary:
 
-;; Convert your Kindle highlights to an org tree.
+;; Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tree with format:
+
+;; * Book Title
+;; ** Note contents
+;; - Metadata (location and time)
+;; ** Note contents
+;; - Metadata (location and time)
+;;
+;; Usage:
+;;
+;; 1. Add `kindle-highlights-to-org.el` into your load path.
+;; 2. Position your cursor in an org file where you want the data inserted
+;;    (tree will be inserted relative to current heading).
+;; 3. Call `(kindle-highlights-to-org)` and select your `My Clippings.txt` file,
+;;    usually located in the `/documents` folder of your USB-connected Kindle.
+;;
+;; Note that the original file isn't modified and the tree will be built from
+;; scratch every time so it may be worth deleting it to force a new file to be
+;; created after you've pulled the data.
 ;;
 ;;; Code:
 

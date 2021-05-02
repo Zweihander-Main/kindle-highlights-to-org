@@ -1,8 +1,8 @@
-## kindle-highlights-to-org
+# kindle-highlights-to-org
 
 > Convert your Kindle highlights to an org tree
 
-### Overview
+## Overview
 
 Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tree with format:
 
@@ -14,7 +14,7 @@ Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tr
 - Metadata (location and time)
 ```
 
-### Usage
+## Usage
 
 1. Add `kindle-highlights-to-org.el` into your load path. 
 2. Position your cursor in an org file where you want the data inserted (tree will be inserted relative to current heading).
@@ -24,7 +24,7 @@ Note that the original file isn't modified and the tree will be built from scrat
 
 Tested on Kindle Paperwhite.
 
-### Future improvements
+## Future improvements
 
 - Make sure in org buffer
 - Break up metadata
