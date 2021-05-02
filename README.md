@@ -24,6 +24,13 @@ Note that the original file isn't modified and the tree will be built from scrat
 
 Tested on Kindle Paperwhite.
 
+### Future improvements
+
+- Make sure in org buffer
+- Break up metadata
+- Add tests
+- Include more options for tree construction
+
 ## Available for Hire
 
 I'm available for freelance, contracts, and consulting both remotely and in the Hudson Valley, NY (USA) area. [Some more about me](https://www.zweisolutions.com/about.html) and [what I can do for you](https://www.zweisolutions.com/services.html).
