@@ -64,12 +64,13 @@ KEY: TITLE
 VALUE:
     List of plists, each with:
         META: Metadata including location and highlight date as string.
-        NOTE: Notedata as one string (newlines aren't saved by the device)."
+        CONTENTS: Notedata as one string (newlines aren't saved by the device)."
   (let ((bookhash (make-hash-table :test 'equal)))
     (with-temp-buffer
       (insert-file-contents path)
       (while (search-forward "==========" nil t)
         (forward-line -4) ; to title
+        ;; Grab just the line data without newlines at the end
         (let* ((title (buffer-substring-no-properties
                        (line-beginning-position)
                        (line-end-position)))
@@ -86,25 +87,44 @@ VALUE:
             (puthash title '() bookhash))
           (let ((curnotes (gethash title bookhash))
                 (note-plist (list :meta metadata
-                                  :note notedata)))
+                                  :contents notedata)))
             (push note-plist curnotes)
             (puthash title curnotes bookhash))
           (forward-line 1)
           (end-of-line))) ; end of note block
       bookhash)))
 
-(defun kindle-highlights-to-org--main ()
-  "Placeholder."
-  ;; Parses the file into note blocks
-  ;; Creates a books set-like list
-  ;; Loops through blocks
-  ;; Parses metadata and note data from each block
-  ;; If the book doesn't exist in the book list, add it
-  ;; Add block data to book in book list
-  ;; For each book in book list, create a book org heading
-  ;; Under each book org heading, create a note heading for each note
-  ;; Add in note metadata under each note
-  )
+(defun kindle-highlights-to-org--insert-as-org (bookhash)
+  "Takes BOOKHASH and outputs org tree.
+
+Org tree should respect current relative heading and is in the format:
+* Book
+** Note contents
+Metadata
+** Note contents
+Metadata
+
+BOOKHASH is from the `kindle-highlights-to-org--process-file' function."
+  (maphash
+   (lambda (book notes)
+     (org-insert-heading-respect-content t)
+     (org-edit-headline book)
+     (dolist (note notes)
+       (let ((meta (plist-get note :meta))
+             (contents (plist-get note :contents)))
+         (save-excursion
+           (org-insert-subheading nil)
+           (org-edit-headline contents)
+           (end-of-line)
+           (newline-and-indent)
+           (insert meta)))))
+   bookhash))
+
+(defun kindle-highlights-to-org ()
+  "Ask for a file and convert it into an org tree relative to the current heading."
+  (let* ((path (kindle-highlights-to-org--get-file-path))
+         (bookhash (kindle-highlights-to-org--process-file path)))
+    (kindle-highlights-to-org--insert-as-org bookhash)))
 
 (provide 'kindle-highlights-to-org)
 
