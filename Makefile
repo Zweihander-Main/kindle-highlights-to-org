@@ -11,3 +11,6 @@ testWatch:
 		make test; \
 		inotifywait -qre close_write .; \
 	done
+
+lint:
+	cask exec elsa $(SOURCE)
