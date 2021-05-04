@@ -47,7 +47,7 @@
   (f-join khto-fixtures-directory "./My Clippings.txt")
   "The main My Clippings.txt fixture.")
 
-(describe "kindle-highlights-to-org--get-file-path"
+(describe "The get-file-path function"
   (before-each
     (spy-on 'read-file-name)
     (spy-on 'y-or-n-p))
@@ -78,6 +78,14 @@
     (expect
      (kindle-highlights-to-org--get-file-path khto-main-fixture)
      :to-equal (expand-file-name khto-main-fixture))))
+
+(describe "The process-file function"
+  (before-each
+    (kindle-highlights-to-org--process-file (expand-file-name khto-main-fixture)))
+
+  ;; Match intended output
+  ;; Don't break on edge cases
+  )
 
 ;; Local Variables:
 ;; coding: utf-8

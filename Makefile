@@ -9,7 +9,7 @@ test:
 testWatch:
 	while true; do \
 		make test; \
-		inotifywait -qre close_write .; \
+		inotifywait -qre close_write $(SOURCE) $(TEST); \
 	done
 
 lint:
