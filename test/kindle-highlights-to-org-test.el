@@ -61,11 +61,11 @@
     (kindle-highlights-to-org--get-file-path khto-main-fixture)
     (expect 'read-file-name :not :to-have-been-called))
 
-  (it "asks the user if the supplied file doesn't match 'My Clippings.txt'"
+  (it "asks the user if the supplied file doesn't match My Clippings.txt"
     (kindle-highlights-to-org--get-file-path "./test/fixtures/test.txt")
     (expect 'y-or-n-p :to-have-been-called))
 
-  (it "doesn't ask the user if the supplied file matches 'My Clippings.txt'"
+  (it "doesn't ask the user if the supplied file matches My Clippings.txt"
     (kindle-highlights-to-org--get-file-path khto-main-fixture)
     (expect 'y-or-n-p :not :to-have-been-called))
 

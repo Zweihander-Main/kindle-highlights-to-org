@@ -32,7 +32,6 @@ Tested on Kindle Paperwhite.
 - FIX: notes are reversed per book
 - FIX: extra lines are inserted in certain org buffers (roam)
 - FIX: Book titles are occasionally not equal, change equality function?
-- Add in Makefile
 
 ## Available for Hire
 
