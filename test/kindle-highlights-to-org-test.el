@@ -32,11 +32,52 @@
 ;;; Code:
 
 (require 'buttercup)
+(require 'f)
 (require 'kindle-highlights-to-org)
 
-(describe "Tests nothing"
-  (it "contains a spec with an expectation"
-    (expect t :to-be t)))
+(defconst khto-test-directory
+  "./test"
+  "The test directory.")
+
+(defconst khto-fixtures-directory
+  (f-join khto-test-directory "./fixtures")
+  "The fixtures directory.")
+
+(defconst khto-main-fixture
+  (f-join khto-fixtures-directory "./My Clippings.txt")
+  "The main My Clippings.txt fixture.")
+
+(describe "kindle-highlights-to-org--get-file-path"
+  (before-each
+    (spy-on 'read-file-name)
+    (spy-on 'y-or-n-p))
+
+  (it "prompts for a file if none is given"
+    (spy-on 'read-file-name :and-return-value khto-main-fixture)
+    (kindle-highlights-to-org--get-file-path)
+    (expect 'read-file-name :to-have-been-called))
+
+  (it "doesn't prompt for a file if a path is given"
+    (kindle-highlights-to-org--get-file-path khto-main-fixture)
+    (expect 'read-file-name :not :to-have-been-called))
+
+  (it "asks the user if the supplied file doesn't match 'My Clippings.txt'"
+    (kindle-highlights-to-org--get-file-path "./test/fixtures/test.txt")
+    (expect 'y-or-n-p :to-have-been-called))
+
+  (it "doesn't ask the user if the supplied file matches 'My Clippings.txt'"
+    (kindle-highlights-to-org--get-file-path khto-main-fixture)
+    (expect 'y-or-n-p :not :to-have-been-called))
+
+  (it "checks file exists"
+    (expect
+     (kindle-highlights-to-org--get-file-path "./test/nope/My Clippings.txt")
+     :to-equal "File doesn't exist."))
+
+  (it "returns an expanded path from a relative one"
+    (expect
+     (kindle-highlights-to-org--get-file-path khto-main-fixture)
+     :to-equal (expand-file-name khto-main-fixture))))
 
 ;; Local Variables:
 ;; coding: utf-8
