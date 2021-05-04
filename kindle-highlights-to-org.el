@@ -52,6 +52,7 @@
 ;; TODO: Make sure running in org buffer
 
 (require 's)
+(require 'org)
 
 (defun kindle-highlights-to-org--get-file-path (&optional path)
   "Asks the user for a file to read or read the full path from PATH.

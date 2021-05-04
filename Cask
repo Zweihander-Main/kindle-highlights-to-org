@@ -6,6 +6,7 @@
 (files "kindle-highlights-to-org.el")
 
 (depends-on "s")
+(depends-on "org")
 
 (development
  (depends-on "f")
