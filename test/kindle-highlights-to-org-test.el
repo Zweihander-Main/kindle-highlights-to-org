@@ -79,16 +79,69 @@
      (kindle-highlights-to-org--get-file-path khto-main-fixture)
      :to-equal (expand-file-name khto-main-fixture))))
 
-(describe "The process-file function"
-  (before-each
-    (kindle-highlights-to-org--process-file (expand-file-name khto-main-fixture)))
+(describe "The process-file function return value"
+  ;; Check grouping, reversing, metadata
+  (it "should group based on book title"
+    (expect (hash-table-keys
+             (kindle-highlights-to-org--process-file
+              (expand-file-name khto-main-fixture)))
+            :to-have-same-items-as
+            '("The First Book (Author First)"
+              "The Second Book (Author Second)")))
 
-  ;; Match intended output
+  (it "should put the books in the original order"
+    (expect (car (hash-table-keys
+                  (kindle-highlights-to-org--process-file
+                   (expand-file-name khto-main-fixture))))
+            :to-equal "The First Book (Author First)"))
+
+  (it "should pull all the notes"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :contents))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name khto-main-fixture)))))
+            :to-have-same-items-as
+            '("This is the first note."
+              "This is the second note."
+              "This is the third note.")))
+
+  (it "should put the notes in the right order"
+    (expect (plist-get (car (car (hash-table-values
+                                  (kindle-highlights-to-org--process-file
+                                   (expand-file-name khto-main-fixture)))))
+                       :contents)
+            :to-equal "This is the first note."))
+
+
+  (it "should pull all the metadata"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :meta))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name khto-main-fixture)))))
+            :to-have-same-items-as
+            '("- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"
+              "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
+              "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
+
+  (it "should put the metadata in the right order"
+    (expect (plist-get (car (car (hash-table-values
+                                  (kindle-highlights-to-org--process-file
+                                   (expand-file-name khto-main-fixture)))))
+                       :contents)
+            :to-equal
+            "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"))
+
+
   ;; Don't break on edge cases
   )
 
 ;; Local Variables:
 ;; coding: utf-8
+;; flycheck-disabled-checkers: 'emacs-lisp-elsa
 ;; End:
 
 ;;; kindle-highlights-to-org-test.el ends here
