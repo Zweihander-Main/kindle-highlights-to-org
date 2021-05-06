@@ -1,5 +1,4 @@
-;;; kindle-highlights-to-org.el --- Convert your Kindle highlights to an org tree
-;;; -*- lexical-binding: t; -*-
+;;; kindle-highlights-to-org.el --- Convert your Kindle highlights to an org tree-*-lexical-binding:t-*-
 
 ;; Copyright (C) 2021, Zweihänder <zweidev@zweihander.me>
 ;;

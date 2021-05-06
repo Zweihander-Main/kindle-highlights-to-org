@@ -1,5 +1,4 @@
-;;; kindle-highlights-to-org-test.el --- Tests for kindle-highlights-to-org
-;;; -*- lexical-binding: t; -*-
+;;; kindle-highlights-to-org-test.el --- Tests for kindle-highlights-to-org-*-lexical-binding:t-*-
 
 ;; Copyright (C) 2021, Zweihänder <zweidev@zweihander.me>
 ;;
