@@ -46,6 +46,33 @@
   (f-join khto-fixtures-directory "./My Clippings.txt")
   "The main My Clippings.txt fixture.")
 
+(defconst khto-main-fixture-hash
+  #s(hash-table
+     size 65
+     test equal
+     rehash-size 1.5
+     rehash-threshold 0.8125
+     data (
+           "The First Book (Author First)"
+           ((:meta "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"
+             :contents "This is the first note.")
+            (:meta "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
+             :contents "This is the third note."))
+           "The Second Book (Author Second)"
+           ((:meta "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
+             :contents "This is the second note."))))
+  "The hash table equivalent of the main fixture.")
+
+(defun hash-equal (hash1 hash2)
+  "Compare HASH1 to HASH2 to see whether they are equal."
+  (and (= (hash-table-count hash1)
+          (hash-table-count hash2))
+       (catch 'flag (maphash (lambda (x y)
+                               (or (equal (gethash x hash2) y)
+                                   (throw 'flag nil)))
+                             hash1)
+              (throw 'flag t))))
+
 (describe "The get-file-path function"
   (before-each
     (spy-on 'read-file-name)
@@ -108,8 +135,8 @@
 
   (it "should put the notes in the right order"
     (expect (plist-get (car (-flatten-n 1 (hash-table-values
-                                  (kindle-highlights-to-org--process-file
-                                   (expand-file-name khto-main-fixture)))))
+                                           (kindle-highlights-to-org--process-file
+                                            (expand-file-name khto-main-fixture)))))
                        :contents)
             :to-equal "This is the first note."))
 
@@ -132,16 +159,51 @@
                                    (expand-file-name khto-main-fixture)))))
                        :meta)
             :to-equal
-            "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"))
+            "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM")))
 
+(describe "The insert-as-org function"
+  :var ((from-process-file
+         (progn
+           (with-temp-buffer
+             (org-mode)
+             (kindle-highlights-to-org--insert-as-org
+              (kindle-highlights-to-org--process-file
+               (expand-file-name khto-main-fixture)))
+             (buffer-string))))
+        (from-fixture-hash
+         (progn
+           (with-temp-buffer
+             (org-mode)
+             (kindle-highlights-to-org--insert-as-org khto-main-fixture-hash)
+             (buffer-string))))
+        (from-fixture-hash-deep
+         (progn
+           (with-temp-buffer
+             (org-mode)
+             (insert "**** Deep heading")
+             (kindle-highlights-to-org--insert-as-org khto-main-fixture-hash)
+             (buffer-string)))))
 
-  ;; TODO Don't break on edge cases
-  ;; Empty file
-  )
+  (it "should construct the intended org tree based on the fixture"
+    (expect from-process-file :to-equal from-fixture-hash ))
 
-;; Local Variables:
-;; coding: utf-8
-;; flycheck-disabled-checkers: 'emacs-lisp-elsa
-;; End:
+  (it "should construct the tree relative to the root note"
+    (expect
+     from-fixture-hash-deep
+     :to-equal
+     "**** Deep heading
+**** The First Book (Author First)
+***** This is the third note.
+      - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
+***** This is the first note.
+      - Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM
+**** The Second Book (Author Second)
+***** This is the second note.
+      - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
+
+  ;; Local Variables:
+  ;; coding: utf-8
+  ;; flycheck-disabled-checkers: 'emacs-lisp-elsa
+  ;; End:
 
 ;;; kindle-highlights-to-org-test.el ends here

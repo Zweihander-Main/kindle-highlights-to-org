@@ -5,7 +5,7 @@
 ;; Author: Zweihänder
 ;; Keywords: org-mode, kindle
 ;; Homepage: https://github.com/Zweihander-Main/kindle-highlights-to-org
-;; Version: 0.0.1
+;; Version: 0.0.2
 
 ;; This file is not part of GNU Emacs.
 
