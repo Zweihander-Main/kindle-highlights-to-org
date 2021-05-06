@@ -4,7 +4,7 @@
 
 ## Overview
 
-Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tree with format:
+Takes a `My Clippings.txt` file from a Kindle and converts it into a relative org tree with format:
 
 ``` org
 * Book Title
@@ -13,6 +13,8 @@ Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tr
 ** Note contents
 - Metadata (location and time)
 ```
+
+Does not modify original file or update existing data. 
 
 ## Usage
 
@@ -24,8 +26,10 @@ Note that the original file isn't modified and the tree will be built from scrat
 
 Tested on Kindle Paperwhite.
 
-## Future improvements
+## Possible future improvements
 
+- Breaking up metadata
+- Add hash to notes to allow updating
 - Make sure in org buffer
 - Include more options for tree construction
 - Sanity check on the file?
