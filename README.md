@@ -1,6 +1,6 @@
 # kindle-highlights-to-org
 
-> Convert your Kindle highlights to an org tree
+> An Emacs package to convert your Kindle highlights to an org tree
 
 ## Overview
 
