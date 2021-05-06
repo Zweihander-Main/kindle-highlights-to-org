@@ -108,7 +108,7 @@
               "This is the third note.")))
 
   (it "should put the notes in the right order"
-    (expect (plist-get (car (car (hash-table-values
+    (expect (plist-get (car (-flatten-n 1 (hash-table-values
                                   (kindle-highlights-to-org--process-file
                                    (expand-file-name khto-main-fixture)))))
                        :contents)
@@ -131,12 +131,13 @@
     (expect (plist-get (car (car (hash-table-values
                                   (kindle-highlights-to-org--process-file
                                    (expand-file-name khto-main-fixture)))))
-                       :contents)
+                       :meta)
             :to-equal
             "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"))
 
 
-  ;; Don't break on edge cases
+  ;; TODO Don't break on edge cases
+  ;; Empty file
   )
 
 ;; Local Variables:

@@ -121,16 +121,15 @@ VALUE:
                                 (buffer-substring-no-properties
                                  (line-beginning-position)
                                  (line-end-position)))))
-          ;; TODO break up metadata
           (unless (gethash title bookhash)
             (puthash title '() bookhash))
           (let ((curnotes (gethash title bookhash))
                 (note-plist (list :meta metadata
                                   :contents notedata)))
-            (push note-plist curnotes)
+            (setq curnotes (append curnotes (list note-plist)))
             (puthash title curnotes bookhash))
           (forward-line 1)
-          (end-of-line))) ; end of note block
+          (end-of-line))) ; end of all notes
       bookhash)))
 
 (defun kindle-highlights-to-org--insert-as-org (bookhash)

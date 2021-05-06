@@ -27,9 +27,8 @@ Tested on Kindle Paperwhite.
 ## Future improvements
 
 - Make sure in org buffer
-- Break up metadata
 - Include more options for tree construction
-- FIX: notes are reversed per book
+- Sanity check on the file?
 - FIX: extra lines are inserted in certain org buffers (roam)
 
 ## Available for Hire
