@@ -31,7 +31,6 @@ Tested on Kindle Paperwhite.
 - Include more options for tree construction
 - FIX: notes are reversed per book
 - FIX: extra lines are inserted in certain org buffers (roam)
-- FIX: Book titles are occasionally not equal, change equality function?
 
 ## Available for Hire
 

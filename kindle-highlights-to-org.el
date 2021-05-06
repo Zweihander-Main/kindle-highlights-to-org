@@ -110,9 +110,9 @@ VALUE:
       (while (search-forward "==========" nil t)
         (forward-line -4) ; to title
         ;; Grab just the line data without newlines at the end
-        (let* ((title (buffer-substring-no-properties
+        (let* ((title (s-trim (buffer-substring-no-properties
                        (line-beginning-position)
-                       (line-end-position)))
+                       (line-end-position))))
                (metadata (progn (forward-line 1)
                                 (buffer-substring-no-properties
                                  (line-beginning-position)
