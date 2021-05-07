@@ -48,10 +48,13 @@
 ;;
 ;;; Code:
 
-;; TODO: Make sure running in org buffer
-
 (require 's)
 (require 'org)
+
+(defgroup kindle-highlights-to-org nil
+  "Customization for 'kindle-highlights-to-org' package."
+  :group 'org
+  :prefix "kindle-highlights-to-org-")
 
 (defun kindle-highlights-to-org--get-file-path (&optional path)
   "Asks the user for a file to read or read the full path from PATH.
