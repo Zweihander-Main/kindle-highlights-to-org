@@ -18,7 +18,12 @@ Does not modify original file or update existing data.
 
 ## Usage
 
-1. Add `kindle-highlights-to-org.el` into your load path. 
+1. Add `kindle-highlights-to-org.el` into your load path. Set the appropriate `use-package`, something like the following for DOOM and `org-roam`:
+``` emacs-lisp
+(use-package! kindle-highlights-to-org
+  :after org-roam
+  :defer t)
+```
 2. Position your cursor in an org file where you want the data inserted (tree will be inserted relative to current heading).
 3. Call `(kindle-highlights-to-org)` and select your `My Clippings.txt` file, usually located in the `/documents` folder of your USB-connected Kindle.
 
