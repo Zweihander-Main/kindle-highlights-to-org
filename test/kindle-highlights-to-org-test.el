@@ -105,6 +105,32 @@
      (kindle-highlights-to-org--get-file-path khto-main-fixture)
      :to-equal (expand-file-name khto-main-fixture))))
 
+(describe "The normalize-string function"
+  :var ((bom-test (kindle-highlights-to-org--normalize-string
+                   (concat
+                    (string (char-from-name "ZERO WIDTH NO-BREAK SPACE"))
+                    "Test"))
+                  ))
+  (it "should retain normal strings"
+    (expect
+     (kindle-highlights-to-org--normalize-string "Test")
+     :to-equal "Test"))
+
+  (it "should trim extra whitespace"
+    (expect
+     (kindle-highlights-to-org--normalize-string " Test ")
+     :to-equal "Test"))
+
+  (it "should remove BOM marks"
+    (expect bom-test
+            :to-equal "Test")
+    (expect bom-test
+            :not :to-equal
+            (concat
+             (string (char-from-name "ZERO WIDTH NO-BREAK SPACE"))
+             "Test"))
+    ))
+
 (describe "The process-file function return value"
   ;; Check grouping, reversing, metadata
   (it "should group based on book title"
@@ -201,9 +227,9 @@
 ***** This is the second note.
       - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
 
-  ;; Local Variables:
-  ;; coding: utf-8
-  ;; flycheck-disabled-checkers: 'emacs-lisp-elsa
-  ;; End:
+;; Local Variables:
+;; coding: utf-8
+;; flycheck-disabled-checkers: 'emacs-lisp-elsa
+;; End:
 
 ;;; kindle-highlights-to-org-test.el ends here

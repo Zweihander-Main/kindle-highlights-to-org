@@ -85,6 +85,18 @@ it can be read and the name is what the user intends."
       ;; Return path
       full-file-path)))
 
+(defun kindle-highlights-to-org--normalize-string (str)
+  "Takes STR string, trims whitespace, and removes BOM marks.
+
+Needed for titles from Kindle generated files which may add in BOM<FEFF> marks
+on some but not all titles (possibly related to files spanning multiple firmware
+versions). Additionally, BOM marks may be found after the first line. Titles are
+used as keys for note hash table and are compared using 'equal so BOM marks
+matter."
+  (s-trim (remove
+           (char-from-name "ZERO WIDTH NO-BREAK SPACE")
+           str)))
+
 ;;; Format of My Clippings.txt file:
 ;;;     - 5 lines for each note, regardless of length
 ;;; 1. TITLE
@@ -118,9 +130,10 @@ VALUE:
       (while (search-forward "==========" nil t)
         (forward-line -4) ; to title
         ;; Grab just the line data without newlines at the end
-        (let* ((title (s-trim (buffer-substring-no-properties
-                               (line-beginning-position)
-                               (line-end-position))))
+        (let* ((title (kindle-highlights-to-org--normalize-string
+                       (buffer-substring-no-properties
+                        (line-beginning-position)
+                        (line-end-position))))
                (metadata (progn (forward-line 1)
                                 (buffer-substring-no-properties
                                  (line-beginning-position)

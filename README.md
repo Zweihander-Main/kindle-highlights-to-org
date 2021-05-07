@@ -24,7 +24,7 @@ Does not modify original file or update existing data.
   :after org-roam
   :defer t)
 ```
-2. Position your cursor in an org file where you want the data inserted (tree will be inserted relative to current heading).
+2. Position your cursor in an org buffer where you want the data inserted (tree will be inserted relative to current heading).
 3. Call `(kindle-highlights-to-org)` and select your `My Clippings.txt` file, usually located in the `/documents` folder of your USB-connected Kindle.
 
 Note that the original file isn't modified and the tree will be built from scratch every time so it may be worth deleting it to force a new file to be created after you've pulled the data. 
@@ -34,8 +34,7 @@ Tested on Kindle Paperwhite.
 ## Possible future improvements
 
 - Breaking up metadata
-- Add hash to notes to allow updating
-- Make sure in org buffer
+- Add hash to notes to allow updating (has internationalization problems)
 - Include more options for tree construction
 - Sanity check on the file?
 
