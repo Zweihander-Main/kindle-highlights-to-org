@@ -38,7 +38,6 @@ Tested on Kindle Paperwhite.
 - Make sure in org buffer
 - Include more options for tree construction
 - Sanity check on the file?
-- FIX: extra lines are inserted in certain org buffers (roam)
 
 ## Available for Hire
 
