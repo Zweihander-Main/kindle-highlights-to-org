@@ -56,6 +56,9 @@
   :group 'org
   :prefix "kindle-highlights-to-org-")
 
+(defvar kindle-highlights-to-org-verbose nil
+  "If non-nil, will display progress messages.")
+
 (defun kindle-highlights-to-org--get-file-path (&optional path)
   "Asks the user for a file to read or read the full path from PATH.
 Return full path of the file. Performs basic checking on the file to confirm
@@ -82,13 +85,15 @@ it can be read and the name is what the user intends."
       ;; Return path
       full-file-path)))
 
-;;; Format notes:
+;;; Format of My Clippings.txt file:
 ;;;     - 5 lines for each note, regardless of length
 ;;; 1. TITLE
 ;;; 2. METADATA
-;;;     - separated by |
-;;;     - sometimes 2 blocks, sometimes 3
+;;;     - one line with blocks separated by | char
+;;;     - some amount of blocks, usually 2-3 but 4 might be possible
 ;;;     - last block should be time added
+;;;     - can be broken apart but identifying blocks is difficult due to
+;;;       language differences eg 'Added on' is only for English
 ;;; 3. BLANK LINE
 ;;; 4. NOTEDATA
 ;;;     - appears to always all be on one line
@@ -96,6 +101,7 @@ it can be read and the name is what the user intends."
 ;;; 5. SEPERATOR
 ;;;     - 10 equal signs
 ;;;     - ==========
+;;;     - is at the end of the note block, not the start (file ends with one)
 
 (defun kindle-highlights-to-org--process-file (path)
   "Takes an absolute PATH and return a hash table with note data.
@@ -119,7 +125,7 @@ VALUE:
                                 (buffer-substring-no-properties
                                  (line-beginning-position)
                                  (line-end-position))))
-               (notedata (progn (forward-line 2)
+               (notedata (progn (forward-line 2) ; skip blank
                                 (buffer-substring-no-properties
                                  (line-beginning-position)
                                  (line-end-position)))))
@@ -128,10 +134,10 @@ VALUE:
           (let ((curnotes (gethash title bookhash))
                 (note-plist (list :meta metadata
                                   :contents notedata)))
-            (setq curnotes (append curnotes (list note-plist)))
+            (setq curnotes (append curnotes (list note-plist))) ; perf trap
             (puthash title curnotes bookhash))
           (forward-line 1)
-          (end-of-line))) ; end of all notes
+          (end-of-line)))
       bookhash)))
 
 (defun kindle-highlights-to-org--insert-as-org (bookhash)
