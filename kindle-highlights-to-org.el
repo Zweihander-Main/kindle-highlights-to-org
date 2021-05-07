@@ -119,8 +119,8 @@ VALUE:
         (forward-line -4) ; to title
         ;; Grab just the line data without newlines at the end
         (let* ((title (s-trim (buffer-substring-no-properties
-                       (line-beginning-position)
-                       (line-end-position))))
+                               (line-beginning-position)
+                               (line-end-position))))
                (metadata (progn (forward-line 1)
                                 (buffer-substring-no-properties
                                  (line-beginning-position)
@@ -171,9 +171,12 @@ BOOKHASH is from the `kindle-highlights-to-org--process-file' function."
 
 (defun kindle-highlights-to-org ()
   "Ask for a file and convert it into an org tree relative to the current heading."
-  (let* ((path (kindle-highlights-to-org--get-file-path))
-         (bookhash (kindle-highlights-to-org--process-file path)))
-    (kindle-highlights-to-org--insert-as-org bookhash)))
+  (catch 'exit
+    (unless (eq major-mode 'org-mode)
+      (throw 'exit "Not in org-mode, exiting."))
+    (let* ((path (kindle-highlights-to-org--get-file-path))
+           (bookhash (kindle-highlights-to-org--process-file path)))
+      (kindle-highlights-to-org--insert-as-org bookhash))))
 
 (provide 'kindle-highlights-to-org)
 
