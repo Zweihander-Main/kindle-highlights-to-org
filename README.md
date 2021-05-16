@@ -16,6 +16,8 @@ Takes a `My Clippings.txt` file from a Kindle and converts it into a relative or
 
 Does not modify original file or update existing data. 
 
+Important: does not currently work with notes typed manually with line breaks in them. Fix is planned.
+
 ## Usage
 
 1. Add `kindle-highlights-to-org.el` into your load path. Set the appropriate `use-package`, something like the following for DOOM and `org-roam`:
@@ -33,6 +35,7 @@ Tested on Kindle Paperwhite.
 
 ## Possible future improvements
 
+- Multiline note support
 - Breaking up metadata
 - Add hash to notes to allow updating (has internationalization problems)
 - Include more options for tree construction
