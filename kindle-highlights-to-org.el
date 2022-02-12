@@ -185,6 +185,7 @@ BOOKHASH is from the `kindle-highlights-to-org--process-file' function."
 ;;;###autoload
 (defun kindle-highlights-to-org ()
   "Ask for a file and convert it into an org tree relative to the current heading."
+  (interactive)
   (catch 'exit
     (unless (eq major-mode 'org-mode)
       (throw 'exit "Not in org-mode, exiting."))
