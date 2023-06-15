@@ -3,9 +3,10 @@
 ;; Copyright (C) 2021, Zweihänder <zweidev@zweihander.me>
 ;;
 ;; Author: Zweihänder
-;; Keywords: org-mode, kindle
+;; Keywords: outlines convenience hardware
 ;; Homepage: https://github.com/Zweihander-Main/kindle-highlights-to-org
 ;; Version: 0.0.2
+;; Package-Requires: ((emacs "26.1") (s "1.12.0"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -26,7 +27,8 @@
 
 ;;; Commentary:
 
-;; Takes a `My Clippings.txt` file from a Kindle and converts it into a relative tree with format:
+;; Takes a `My Clippings.txt` file from a Kindle and converts it into a relative
+;; tree with format:
 
 ;; * Book Title
 ;; ** Note contents
@@ -61,7 +63,7 @@
 
 (defun kindle-highlights-to-org--get-file-path (&optional path)
   "Asks the user for a file to read or read the full path from PATH.
-Return full path of the file. Performs basic checking on the file to confirm
+Return full path of the file.  Performs basic checking on the file to confirm
 it can be read and the name is what the user intends."
   (interactive "P")
   (catch 'exit
@@ -86,12 +88,12 @@ it can be read and the name is what the user intends."
       full-file-path)))
 
 (defun kindle-highlights-to-org--normalize-string (str)
-  "Takes STR string, trims whitespace, and removes BOM marks.
+  "Takes STR string, trim whitespace, and remove BOM mark.
 
 Needed for titles from Kindle generated files which may add in BOM<FEFF> marks
 on some but not all titles (possibly related to files spanning multiple firmware
-versions). Additionally, BOM marks may be found after the first line. Titles are
-used as keys for note hash table and are compared using 'equal so BOM marks
+versions).  Additionally, BOM marks may be found after the first line.  Titles
+are used as keys for note hash table and are compared using 'equal so BOM marks
 matter."
   (s-trim (remove
            (char-from-name "ZERO WIDTH NO-BREAK SPACE")
