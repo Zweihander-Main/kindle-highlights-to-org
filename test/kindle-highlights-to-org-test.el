@@ -3,9 +3,10 @@
 ;; Copyright (C) 2021, Zweihänder <zweidev@zweihander.me>
 ;;
 ;; Author: Zweihänder
-;; Keywords: org-mode, kindle
+;; Keywords: outlines
 ;; Homepage: https://github.com/Zweihander-Main/kindle-highlights-to-org
 ;; Version: 0.0.1
+;; Package-Requires: ((emacs "26.1"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -34,19 +35,19 @@
 (require 'f)
 (require 'kindle-highlights-to-org)
 
-(defconst khto-test-directory
+(defconst kindle-highlights-to-org-test-test-directory
   "./test"
   "The test directory.")
 
-(defconst khto-fixtures-directory
-  (f-join khto-test-directory "./fixtures")
+(defconst kindle-highlights-to-org-test-fixtures-directory
+  (f-join kindle-highlights-to-org-test-test-directory "./fixtures")
   "The fixtures directory.")
 
-(defconst khto-main-fixture
-  (f-join khto-fixtures-directory "./My Clippings.txt")
+(defconst kindle-highlights-to-org-test-main-fixture
+  (f-join kindle-highlights-to-org-test-fixtures-directory "./My Clippings.txt")
   "The main My Clippings.txt fixture.")
 
-(defconst khto-main-fixture-hash
+(defconst kindle-highlights-to-org-test-main-fixture-hash
   #s(hash-table
      size 65
      test equal
@@ -63,7 +64,7 @@
              :contents "This is the second note."))))
   "The hash table equivalent of the main fixture.")
 
-(defun hash-equal (hash1 hash2)
+(defun kindle-highlights-to-org-test-hash-equal (hash1 hash2)
   "Compare HASH1 to HASH2 to see whether they are equal."
   (and (= (hash-table-count hash1)
           (hash-table-count hash2))
@@ -79,12 +80,12 @@
     (spy-on 'y-or-n-p))
 
   (it "prompts for a file if none is given"
-    (spy-on 'read-file-name :and-return-value khto-main-fixture)
+    (spy-on 'read-file-name :and-return-value kindle-highlights-to-org-test-main-fixture)
     (kindle-highlights-to-org--get-file-path)
     (expect 'read-file-name :to-have-been-called))
 
   (it "doesn't prompt for a file if a path is given"
-    (kindle-highlights-to-org--get-file-path khto-main-fixture)
+    (kindle-highlights-to-org--get-file-path kindle-highlights-to-org-test-main-fixture)
     (expect 'read-file-name :not :to-have-been-called))
 
   (it "asks the user if the supplied file doesn't match My Clippings.txt"
@@ -92,7 +93,7 @@
     (expect 'y-or-n-p :to-have-been-called))
 
   (it "doesn't ask the user if the supplied file matches My Clippings.txt"
-    (kindle-highlights-to-org--get-file-path khto-main-fixture)
+    (kindle-highlights-to-org--get-file-path kindle-highlights-to-org-test-main-fixture)
     (expect 'y-or-n-p :not :to-have-been-called))
 
   (it "checks file exists"
@@ -102,15 +103,15 @@
 
   (it "returns an expanded path from a relative one"
     (expect
-     (kindle-highlights-to-org--get-file-path khto-main-fixture)
-     :to-equal (expand-file-name khto-main-fixture))))
+     (kindle-highlights-to-org--get-file-path kindle-highlights-to-org-test-main-fixture)
+     :to-equal (expand-file-name kindle-highlights-to-org-test-main-fixture))))
 
 (describe "The normalize-string function"
   :var ((bom-test (kindle-highlights-to-org--normalize-string
                    (concat
                     (string (char-from-name "ZERO WIDTH NO-BREAK SPACE"))
-                    "Test"))
-                  ))
+                    "Test"))))
+
   (it "should retain normal strings"
     (expect
      (kindle-highlights-to-org--normalize-string "Test")
@@ -128,15 +129,14 @@
             :not :to-equal
             (concat
              (string (char-from-name "ZERO WIDTH NO-BREAK SPACE"))
-             "Test"))
-    ))
+             "Test"))))
 
 (describe "The process-file function return value"
   ;; Check grouping, reversing, metadata
   (it "should group based on book title"
     (expect (hash-table-keys
              (kindle-highlights-to-org--process-file
-              (expand-file-name khto-main-fixture)))
+              (expand-file-name kindle-highlights-to-org-test-main-fixture)))
             :to-have-same-items-as
             '("The First Book (Author First)"
               "The Second Book (Author Second)")))
@@ -144,7 +144,7 @@
   (it "should put the books in the original order"
     (expect (car (hash-table-keys
                   (kindle-highlights-to-org--process-file
-                   (expand-file-name khto-main-fixture))))
+                   (expand-file-name kindle-highlights-to-org-test-main-fixture))))
             :to-equal "The First Book (Author First)"))
 
   (it "should pull all the notes"
@@ -153,7 +153,7 @@
                (plist-get value :contents))
              (-flatten-n 1 (hash-table-values
                             (kindle-highlights-to-org--process-file
-                             (expand-file-name khto-main-fixture)))))
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
             :to-have-same-items-as
             '("This is the first note."
               "This is the second note."
@@ -162,7 +162,7 @@
   (it "should put the notes in the right order"
     (expect (plist-get (car (-flatten-n 1 (hash-table-values
                                            (kindle-highlights-to-org--process-file
-                                            (expand-file-name khto-main-fixture)))))
+                                            (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
                        :contents)
             :to-equal "This is the first note."))
 
@@ -173,7 +173,7 @@
                (plist-get value :meta))
              (-flatten-n 1 (hash-table-values
                             (kindle-highlights-to-org--process-file
-                             (expand-file-name khto-main-fixture)))))
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
             :to-have-same-items-as
             '("- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"
               "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
@@ -182,7 +182,7 @@
   (it "should put the metadata in the right order"
     (expect (plist-get (car (car (hash-table-values
                                   (kindle-highlights-to-org--process-file
-                                   (expand-file-name khto-main-fixture)))))
+                                   (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
                        :meta)
             :to-equal
             "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM")))
@@ -194,20 +194,20 @@
              (org-mode)
              (kindle-highlights-to-org--insert-as-org
               (kindle-highlights-to-org--process-file
-               (expand-file-name khto-main-fixture)))
+               (expand-file-name kindle-highlights-to-org-test-main-fixture)))
              (buffer-string))))
         (from-fixture-hash
          (progn
            (with-temp-buffer
              (org-mode)
-             (kindle-highlights-to-org--insert-as-org khto-main-fixture-hash)
+             (kindle-highlights-to-org--insert-as-org kindle-highlights-to-org-test-main-fixture-hash)
              (buffer-string))))
         (from-fixture-hash-deep
          (progn
            (with-temp-buffer
              (org-mode)
              (insert "**** Deep heading")
-             (kindle-highlights-to-org--insert-as-org khto-main-fixture-hash)
+             (kindle-highlights-to-org--insert-as-org kindle-highlights-to-org-test-main-fixture-hash)
              (buffer-string)))))
 
   (it "should construct the intended org tree based on the fixture"
@@ -220,12 +220,14 @@
      "**** Deep heading
 **** The First Book (Author First)
 ***** This is the third note.
-      - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
 ***** This is the first note.
-      - Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM
+- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM
 **** The Second Book (Author Second)
 ***** This is the second note.
-      - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
+
+(provide 'kindle-highlights-to-org-test)
 
 ;; Local Variables:
 ;; coding: utf-8
