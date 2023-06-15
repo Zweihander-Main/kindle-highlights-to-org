@@ -33,6 +33,10 @@ Note that the original file isn't modified and the tree will be built from scrat
 
 Tested on Kindle Paperwhite.
 
+## Dev notes
+
+- Uses `eldev` for `lint`, `test`, ect.
+
 ## Possible future improvements
 
 - Multiline note support

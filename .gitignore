@@ -66,3 +66,6 @@ flycheck_*.el
 /.bundle/
 /Gemfile.lock
 
+# Added automatically by ‘eldev init’.
+/.eldev
+/Eldev-local
