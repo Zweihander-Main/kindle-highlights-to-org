@@ -17,8 +17,9 @@ Takes a `My Clippings.txt` file from a Kindle and converts it into a relative or
 Does not modify original file or update existing data. 
 
 Notes: 
-- User-inserted newlines should be preserved (these are usually rare)
-- Notes are sorted by date 
+- User-inserted newlines should be preserved (these are usually rare).
+- At the moment, these newlines will create broken headings with newlines in the middle of them.
+- Notes are sorted by date added. 
 
 ## Usage
 
@@ -60,11 +61,10 @@ Tested on Kindle Paperwhite.
 
 ## Possible future improvements
 
-- Multiline note support
-- Breaking up metadata
-- Add hash to notes to allow updating (has internationalization problems)
 - Include more options for tree construction
-- Sanity check on the file?
+- Newlines shouldn't destroy headings. 
+- Better sanity checks on the given file
+- Add hash to notes to allow updating (has internationalization problems)
 
 ## Available for Hire
 
