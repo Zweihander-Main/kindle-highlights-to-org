@@ -66,6 +66,13 @@ Tested on Kindle Paperwhite.
 - Better sanity checks on the given file
 - Add hash to notes to allow updating (has internationalization problems)
 
+## See also
+
+- [lvzon/kindle-clippings](https://github.com/lvzon/kindle-clippings): similar script which outputs to text files, uses python
+- [lxyu/kindle-clippings](https://github.com/lxyu/kindle-clippings): alternative to above
+- [kindle2notion](https://github.com/paperboi/kindle2notion): export Kindle Notes into Notion, uses python
+- [Reading Notes for Kindle](https://github.com/mammuth/kindle-clippings): local web app for managing Kindle notes
+
 ## Available for Hire
 
 I'm available for freelance, contracts, and consulting both remotely and in the Hudson Valley, NY (USA) area. [Some more about me](https://www.zweisolutions.com/about.html) and [what I can do for you](https://www.zweisolutions.com/services.html).
