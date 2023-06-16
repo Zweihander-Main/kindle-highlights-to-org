@@ -16,7 +16,9 @@ Takes a `My Clippings.txt` file from a Kindle and converts it into a relative or
 
 Does not modify original file or update existing data. 
 
-Important: does not currently work with notes typed manually with line breaks in them. Fix is planned.
+Notes: 
+- User-inserted newlines should be preserved (these are usually rare)
+- Notes are sorted by date 
 
 ## Usage
 
@@ -36,6 +38,25 @@ Tested on Kindle Paperwhite.
 ## Dev notes
 
 - Uses `eldev` for `lint`, `test`, ect.
+
+``` emacs-lisp
+;;; Format of My Clippings.txt file:
+;;;     - 5+ lines for each note, regardless of length
+;;; 1. TITLE
+;;; 2. METADATA
+;;;     - one line with blocks separated by | char
+;;;     - some amount of blocks, usually 2-3 but 4 might be possible
+;;;     - last block should be time added
+;;;     - can be broken apart but identifying blocks is difficult due to
+;;;       language differences eg 'Added on' is only for English
+;;; 3. BLANK LINE
+;;; 4-n. NOTEDATA
+;;;     - mostly on one line but user can manually add a newline char
+;;; n+1. SEPERATOR
+;;;     - 10 equal signs
+;;;     - ==========
+;;;     - is at the end of the note block, not the start (file ends with one)
+```
 
 ## Possible future improvements
 

@@ -5,7 +5,7 @@
 ;; Author: Zweihänder
 ;; Keywords: outlines
 ;; Homepage: https://github.com/Zweihander-Main/kindle-highlights-to-org
-;; Version: 0.0.1
+;; Version: 0.0.2
 ;; Package-Requires: ((emacs "26.1"))
 
 ;; This file is not part of GNU Emacs.
@@ -53,15 +53,20 @@
      test equal
      rehash-size 1.5
      rehash-threshold 0.8125
-     data (
-           "The First Book (Author First)"
-           ((:meta "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"
-             :contents "This is the first note.")
-            (:meta "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
-             :contents "This is the third note."))
-           "The Second Book (Author Second)"
-           ((:meta "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
-             :contents "This is the second note."))))
+     data ("The First Book (Author First)"
+           ((:title "The First Book" :author "Author First" :meta-line "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM" :date
+             (12 47 22 16 8 2018 4 -1 nil)
+             :page nil :loc "3776-3778" :contents "This is the first note.")
+            (:title "The First Book" :author "Author First" :meta-line "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM" :date
+             (30 48 3 17 8 2018 5 -1 nil)
+             :page "43" :loc "558-559" :contents "This is the third note.")
+            (:title "The First Book" :author "Author First" :meta-line "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 19, 2018 3:48:30 AM" :date
+             (30 48 3 19 8 2018 5 -1 nil)
+             :page "43" :loc "558-559" :contents "This is the fourth note with\na line break."))
+           "The Sec (o) nd Book (Author Second)"
+           ((:title "The Sec (o) nd Book" :author "Author Second" :meta-line "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM" :date
+             (30 48 3 17 8 2018 5 -1 nil)
+             :page "43" :loc "558-559" :contents "This is the second note."))))
   "The hash table equivalent of the main fixture.")
 
 (defun kindle-highlights-to-org-test-hash-equal (hash1 hash2)
@@ -139,7 +144,7 @@
               (expand-file-name kindle-highlights-to-org-test-main-fixture)))
             :to-have-same-items-as
             '("The First Book (Author First)"
-              "The Second Book (Author Second)")))
+              "The Sec (o) nd Book (Author Second)")))
 
   (it "should put the books in the original order"
     (expect (car (hash-table-keys
@@ -157,7 +162,8 @@
             :to-have-same-items-as
             '("This is the first note."
               "This is the second note."
-              "This is the third note.")))
+              "This is the third note."
+              "This is the fourth note with\na line break.")))
 
   (it "should put the notes in the right order"
     (expect (plist-get (car (-flatten-n 1 (hash-table-values
@@ -167,25 +173,78 @@
             :to-equal "This is the first note."))
 
 
-  (it "should pull all the metadata"
+  (it "should pull all the titles"
     (expect (mapcar
              (lambda (value)
-               (plist-get value :meta))
+               (plist-get value :title))
              (-flatten-n 1 (hash-table-values
                             (kindle-highlights-to-org--process-file
                              (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
             :to-have-same-items-as
-            '("- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM"
-              "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM"
-              "- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
+            '("The First Book"
+              "The First Book"
+              "The First Book"
+              "The Sec (o) nd Book")))
 
-  (it "should put the metadata in the right order"
+  (it "should pull all the authors"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :author))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
+            :to-have-same-items-as
+            '("Author First"
+              "Author First"
+              "Author First"
+              "Author Second")))
+
+  (it "should pull all the dates"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :date))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
+            :to-have-same-items-as
+            '((12 47 22 16 8 2018 4 -1 nil)
+              (30 48 3 17 8 2018 5 -1 nil)
+              (30 48 3 19 8 2018 5 -1 nil)
+              (30 48 3 17 8 2018 5 -1 nil))))
+
+  (it "should pull all the page numbers"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :page))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
+            :to-have-same-items-as
+            '(nil
+              "43"
+              "43"
+              "43")))
+
+  (it "should pull all the location numbers"
+    (expect (mapcar
+             (lambda (value)
+               (plist-get value :loc))
+             (-flatten-n 1 (hash-table-values
+                            (kindle-highlights-to-org--process-file
+                             (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
+            :to-have-same-items-as
+            '("3776-3778"
+              "558-559"
+              "558-559"
+              "558-559")))
+
+  (it "should put the dates in the right order"
     (expect (plist-get (car (car (hash-table-values
                                   (kindle-highlights-to-org--process-file
                                    (expand-file-name kindle-highlights-to-org-test-main-fixture)))))
-                       :meta)
+                       :date)
             :to-equal
-            "- Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM")))
+            '(12 47 22 16 8 2018 4 -1 nil))))
 
 (describe "The insert-as-org function"
   :var ((from-process-file
@@ -219,11 +278,14 @@
      :to-equal
      "**** Deep heading
 **** The First Book (Author First)
-***** This is the third note.
-- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
 ***** This is the first note.
 - Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM
-**** The Second Book (Author Second)
+***** This is the third note.
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
+***** This is the fourth note with
+a line break.
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 19, 2018 3:48:30 AM
+**** The Sec (o) nd Book (Author Second)
 ***** This is the second note.
 - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM")))
 

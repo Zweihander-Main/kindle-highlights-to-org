@@ -1,15 +1,21 @@
 The First Book (Author First)
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
+
+This is the third note.
+==========
+The First Book (Author First)
 - Your Highlight on Location 3776-3778 | Added on Thursday, August 16, 2018 10:47:12 PM
 
 This is the first note.
 ==========
-The Second Book (Author Second)
+The Sec (o) nd Book (Author Second)
 - Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
 
 This is the second note.
 ==========
 The First Book (Author First)
-- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 17, 2018 3:48:30 AM
+- Your Highlight on page 43 | Location 558-559 | Added on Friday, August 19, 2018 3:48:30 AM
 
-This is the third note.
+This is the fourth note with
+a line break.
 ==========

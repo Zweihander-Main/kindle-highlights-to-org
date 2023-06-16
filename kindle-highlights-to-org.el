@@ -58,6 +58,28 @@
   :group 'org
   :prefix "kindle-highlights-to-org-")
 
+(defconst kindle-highlights-to-org--note-seperator "=========="
+  "Separator used in metadata section of 'My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--metadata-separator "|"
+  "Separator used in metadata section of 'My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--regex-title-line "^\\(.*\\)(\\(.*\\))$"
+  "Regex to match title line in `My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--regex-metadata-line
+  "^-\\s*\\S* (\\S+) (.*)[\\s|]+Added on\\s+(.+)$"
+  "Regex to match metadata line in `My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--regex-loc-data "[Ll]ocation \\([0-9\-]+\\)"
+  "Regex to match location data in `My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--regex-page-data "[pP]age \\([0-9\\-]+\\)"
+  "Regex to match page data in `My Clippings.txt' file.")
+
+(defconst kindle-highlights-to-org--regex-date-data "Added on \\(.+\\)$"
+  "Regex to match date data in `My Clippings.txt' file.")
+
 (defvar kindle-highlights-to-org-verbose nil
   "If non-nil, will display progress messages.")
 
@@ -88,7 +110,7 @@ it can be read and the name is what the user intends."
       full-file-path)))
 
 (defun kindle-highlights-to-org--normalize-string (str)
-  "Takes STR string, trim whitespace, and remove BOM mark.
+  "Takes STR string, trim whitespace, and remove BOM mark(s).
 
 Needed for titles from Kindle generated files which may add in BOM<FEFF> marks
 on some but not all titles (possibly related to files spanning multiple firmware
@@ -99,61 +121,113 @@ matter."
            (char-from-name "ZERO WIDTH NO-BREAK SPACE")
            str)))
 
-;;; Format of My Clippings.txt file:
-;;;     - 5 lines for each note, regardless of length
-;;; 1. TITLE
-;;; 2. METADATA
-;;;     - one line with blocks separated by | char
-;;;     - some amount of blocks, usually 2-3 but 4 might be possible
-;;;     - last block should be time added
-;;;     - can be broken apart but identifying blocks is difficult due to
-;;;       language differences eg 'Added on' is only for English
-;;; 3. BLANK LINE
-;;; 4. NOTEDATA
-;;;     - appears to always all be on one line
-;;;     - new lines are not preserved in any way
-;;; 5. SEPERATOR
-;;;     - 10 equal signs
-;;;     - ==========
-;;;     - is at the end of the note block, not the start (file ends with one)
+
+;; TODO write tests for this
+(defun kindle-highlights-to-org--parse-time (str)
+  "Takes STR, run it through `parse-time-string' and add 12 hours if PM."
+  (let* ((time (parse-time-string str))
+         (hour (nth 2 time)))
+    (cond ((and (s-contains? "PM" str t) (< hour 12)) (setf (nth 2 time) (+ hour 12)))
+          ((and (s-contains? "AM" str t) (= hour 12)) (setf (nth 2 time) 0)))
+    time))
+
 
 (defun kindle-highlights-to-org--process-file (path)
   "Takes an absolute PATH and return a hash table with note data.
 Notes are grouped by the book each note came from.
+
+Taken for granted:
+- PATH is a valid readable file.
+- Contents of file are in format:
+TITLE (AUTHOR)
+?PAGE? | ?LOC? | DATE
+CONTENTS
+==========
+
 Format of returned hash table:
-KEY: TITLE
+KEY: TITLE (AUTHOR)
 VALUE:
     List of plists, each with:
-        META: Metadata including location and highlight date as string.
-        CONTENTS: Notedata as one string (newlines aren't saved by the device)."
+        TITLE: Title of book
+        AUTHOR: Author of book
+        META-LINE: Metadata line from file
+        DATE: Date note was added in Emacs `parse-time-string' format
+        PAGE: Page number of note or nil
+        LOC: Location number of note or nil
+        CONTENTS: Notedata as one string."
   (let ((bookhash (make-hash-table :test 'equal)))
     (with-temp-buffer
       (insert-file-contents path)
-      (while (search-forward "==========" nil t)
-        (forward-line -4) ; to title
-        ;; Grab just the line data without newlines at the end
-        (let* ((title (kindle-highlights-to-org--normalize-string
-                       (buffer-substring-no-properties
-                        (line-beginning-position)
-                        (line-end-position))))
-               (metadata (progn (forward-line 1)
-                                (buffer-substring-no-properties
-                                 (line-beginning-position)
-                                 (line-end-position))))
-               (notedata (progn (forward-line 2) ; skip blank
-                                (buffer-substring-no-properties
-                                 (line-beginning-position)
-                                 (line-end-position)))))
-          (unless (gethash title bookhash)
-            (puthash title '() bookhash))
-          (let ((curnotes (gethash title bookhash))
-                (note-plist (list :meta metadata
-                                  :contents notedata)))
-            (setq curnotes (append curnotes (list note-plist))) ; perf trap
-            (puthash title curnotes bookhash))
-          (forward-line 1)
-          (end-of-line)))
-      bookhash)))
+      ;; Break into list of notes, each a string
+      (let* ((file-contents (buffer-substring-no-properties (point-min) (point-max)))
+             (data-list (split-string file-contents kindle-highlights-to-org--note-seperator))
+             (filtered-data (mapc #'kindle-highlights-to-org--normalize-string data-list)))
+        ;; For each filtered-data item, match title and metadata
+        (dolist (item filtered-data)
+          (unless (s-matches? "^[ \n]+$" item) ; skip no-content items
+            (let* ((lines (s-split "\n" item t))
+                   (title-line (nth 0 lines))
+                   (title (s-trim (nth 1 (s-match kindle-highlights-to-org--regex-title-line
+                                                  title-line))))
+                   (author (s-trim (nth 2 (s-match kindle-highlights-to-org--regex-title-line
+                                                   title-line))))
+                   (metadata-line (nth 1 lines))
+                   (metadata-blocks (s-split
+                                     kindle-highlights-to-org--metadata-separator
+                                     metadata-line t))
+                   (date (kindle-highlights-to-org--parse-time
+                          (nth 1 (s-match kindle-highlights-to-org--regex-date-data
+                                          metadata-line))))
+                   (page-block (seq-find
+                                (lambda (str)
+                                  (s-matches?
+                                   kindle-highlights-to-org--regex-page-data
+                                   str))
+                                metadata-blocks))
+                   (loc-block (seq-find
+                               (lambda (str)
+                                 (s-matches?
+                                  kindle-highlights-to-org--regex-loc-data
+                                  str))
+                               metadata-blocks)))
+              (let ((page (if page-block
+                              (nth 1 (s-match kindle-highlights-to-org--regex-page-data
+                                              page-block))
+                            nil))
+                    (loc (if loc-block
+                             (nth 1 (s-match kindle-highlights-to-org--regex-loc-data
+                                             loc-block))
+                           nil))
+                    (contents (s-join "\n" (nthcdr 2 lines))))
+                (when kindle-highlights-to-org-verbose
+                  (message "============\nEntry Found:")
+                  (message "Title Line: %s" title-line)
+                  (message "Parsed Title: %s" title)
+                  (message "Parsed Author: %s" author)
+                  (message "Metadata Line: %s" metadata-line)
+                  (message "Parsed Date: %s" date)
+                  (message "Parsed Page: %s" page)
+                  (message "Parsed Location: %s" loc))
+                ;; Only add book to hash table if not already there
+                (unless (gethash title-line bookhash)
+                  (puthash title-line '() bookhash))
+                ;; Add note to book hash table
+                (let ((curnotes (gethash title-line bookhash))
+                      (note-plist (list :title title
+                                        :author author
+                                        :meta-line metadata-line
+                                        :date date
+                                        :page page
+                                        :loc loc
+                                        :contents contents)))
+                  ;; Add to notes and sort: likely poor performance
+                  (setq curnotes (append curnotes (list note-plist)))
+                  (setq curnotes (sort curnotes
+                                       (lambda (note1 note2)
+                                         (time-less-p (plist-get note1 :date)
+                                                      (plist-get note2 :date)))))
+                  (puthash title-line curnotes bookhash))))))
+        bookhash))))
 
 (defun kindle-highlights-to-org--insert-as-org (bookhash)
   "Takes BOOKHASH and outputs org tree.
@@ -170,8 +244,8 @@ BOOKHASH is from the `kindle-highlights-to-org--process-file' function."
    (lambda (book notes)
      (org-insert-heading-respect-content t)
      (org-edit-headline book)
-     (dolist (note notes)
-       (let ((meta (plist-get note :meta))
+     (dolist (note (reverse notes))
+       (let ((meta-line (plist-get note :meta-line))
              (contents (plist-get note :contents)))
          (save-excursion
            (org-insert-subheading nil)
@@ -179,8 +253,8 @@ BOOKHASH is from the `kindle-highlights-to-org--process-file' function."
              (org-edit-headline contents))
            (end-of-line)
            (newline-and-indent)
-           (when (stringp meta)
-             (insert meta))))))
+           (when (stringp meta-line)
+             (insert meta-line))))))
    bookhash))
 
 ;;;###autoload
