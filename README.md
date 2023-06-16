@@ -20,6 +20,7 @@ Notes:
 - User-inserted newlines should be preserved (these are usually rare).
 - At the moment, these newlines will create broken headings with newlines in the middle of them.
 - Notes are sorted by date added. 
+- May or may not work with languages other than English -- bug reports appreciated
 
 ## Usage
 
